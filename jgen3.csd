@@ -44,15 +44,15 @@ instr makenotes
 	kcounter init 0
 	kresetcounter init 0
 	ireset random 6, 10
-	
+
 	krisetirg init 0
-	
+
 	irise random 30, 60
-	
+
 	knrand random 0, 3
 
 	itrans random 0, 11
-	
+
 	katt rspline 0.1, 0.8, 0.17, 3.19
 	kp rspline 0.9, 1.1, 0.457, 2.39
 
@@ -64,24 +64,24 @@ instr makenotes
 	if (ktrigb == 1) then
 		kcounter = kcounter + 1
 	endif
-	
+
 	if (kcounter > irise) then
 		krisetirg = 1
 	endif
 
 	knoter table knrand, ginotesb
 	knoter = knoter - itrans
-		
-	ktrigr metro (kr/4950) 
+
+	ktrigr metro (kr/4950)
 	kampr rspline 0.015, 0.3, 0.05, 2
 
 	if (krisetirg == 1) then
-		
+
 		schedkwhennamed ktrigr, 0, 0, "rise", 0, 10, kampr, knoter
 	endif
 
 	schedkwhennamed ktrigb, 0, 0, "bowedbar", 0, 5, .5, knoteb, kp, katt
-	
+
 	if (ktrigr == 1 && krisetirg == 1) then
 		kresetcounter = kresetcounter + 1
 	endif
@@ -89,12 +89,8 @@ instr makenotes
 			kcounter = 0
 			kresetcounter = 0
 			krisetirg = 0
-			
-	endif
 
-	printk2 kresetcounter
-	printk2 krisetirg
-	print ireset
+	endif
 
 endin
 
@@ -111,7 +107,7 @@ instr rise
 	asig oscil p4 * aenv, cpsmidinn(p5 - 24) + semitone(arise), giwave
 
 	outs asig, asig
-	
+
 	gaverbL = asig * 0.45
 	gaverbR = asig * 0.45
 
@@ -124,7 +120,7 @@ instr bowedbar
 
 	iatt = p7
 	aenv linsegr 0, 0.05, 0, 0.5, 1, 4, 0, 0.1, 0
-	
+
 	kp   = p6
 	asig wgbowedbar p4, cpsmidinn(p5) + semitone(gkwarble), 1, kp, 0.995
 	asig buthp asig, 200

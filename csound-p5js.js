@@ -20,8 +20,6 @@ function onRuntimeInitialized() {
       cs.setOption("-m0");
       cs.compileCSD(txt);
 
-      cs.start();
-      cs.audioContext.resume();
       csoundLoaded = true;
     }
     finishLoadCsObj();

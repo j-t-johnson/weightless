@@ -1,34 +1,105 @@
-let qtree;
+var number = 0;
+var clickerCount = 0;
+var ramp = 0;
 
+var meow = [];
 
-function setup() {
-    createCanvas(400, 400)
-    strokeWeight(1);
+function setup(){
+    createCanvas(windowWidth, windowHeight);
+    background(0);
 
-    let boundary = new Rectangle(200, 200, 200, 200);
-    qtree = new QuadTree(boundary, 4);
-
-    for (let i = 0; i < 300; i++) {
-        let x = randomGaussian(width / 2, width / 8);
-        let y = randomGaussian(height / 2, height / 8);
-        let p = new Point(x, y);
-        qtree.insert(p);
+    for (var i = 0; i < 2; i++) {
+        meow.push(new Circle(i));
+        meow[i].init();
     }
+
+    stroke(255);
+    textAlign(CENTER);
+    textFont("Verdana")
+    text("loading...", windowWidth/2, windowHeight/2)
 }
 
 function draw() {
+    if (csoundLoaded && clickerCount == 0) {
+        fill(number);
+        stroke(255);
 
+        rectMode(CENTER);
+        rect(windowWidth/2, windowHeight/2, 100, 50);
+        textAlign(CENTER);
+        textFont("Verdana")
+        fill(0);
+        stroke(0);
+        text("render", windowWidth/2, windowHeight/2)
+
+        number = ((number + 0.1) % 100)+ 50;
+    }
+    if (csoundLoaded && clickerCount > 0) {
+
+        noStroke();
+        for (var i = 0; i < meow.length; i++) {
+            meow[i].update();
+            meow[i].draw();
+        }
+        if (ramp < 1) {
+            ramp = ramp + 0.003;
+        }
+    }
+}
+
+function mouseClicked() {
+    if (clickerCount == 0) {
+        clear();
+        background(0);
+        clickerCount++;
+        cs.audioContext.resume();
+        cs.start();
+    }
+}
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
     background(0);
-    strokeWeight(1);
-    qtree.show();
+}
 
-    stroke(0, 255, 0);
-    rectMode(CENTER);
-    let range = new Rectangle(mouseX, mouseY, 10, 10)
-    rect(range.x, range.y, range.w * 2, range.h * 2)
-    let points = qtree.query(range);
-    for (let p of points) {
-        strokeWeight(4);
-        point(p.x, p.y);
+function Circle() {
+
+    this.positionX;
+    this.positionY;
+
+    this.positionXo;
+    this.positionYo;
+    this.positionXn;
+    this.positionYn;
+
+    this.stepx = (this.positionXn - this.positionXo)/128;
+    this.stepy = (this.positionYn - this.positionYo)/128;
+
+    this.number = Math.floor(random(0, 128));
+    this.init = function() {
+            this.positionXo = random(0, windowWidth);
+            this.positionYo = random(0, windowHeight);
+            this.positionXn = random(0, windowWidth);
+            this.positionYn = random(0, windowHeight);
+
+            this.stepx = (this.positionXn - this.positionXo)/128;
+            this.stepy = (this.positionYn - this.positionYo)/128;
+
+            this.positionX = this.positionXo;
+            this.positionY = this.positionYo;
+
+
+    }
+    this.update = function() {
+        this.number = (this.number + 1)% 128;
+        this.positionX = this.positionX + this.stepx;
+        this.positionY = this.positionY + this.stepy;
+        if (this.number == 0) {
+            this.init();
+        }
+    }
+    this.draw = function() {
+        fill((Math.abs(64-this.number*2))*ramp);
+        ellipse(this.positionX, this.positionY, (128-this.number)*2, (128-this.number)*2);
     }
 }
