@@ -99,7 +99,8 @@ function Circle() {
         }
     }
     this.draw = function() {
-        fill((Math.abs(64-this.number*2))*ramp);
-        ellipse(this.positionX, this.positionY, (128-this.number)*2, (128-this.number)*2);
+        noFill()
+        stroke((Math.abs(64-this.number)*2)*ramp);
+        arc(this.positionX, this.positionY, (Math.abs(this.number-64)*2), (Math.abs(this.number-64)*2), 0+this.number*0.01, 1.1+this.number*0.1);
     }
 }
