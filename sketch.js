@@ -1,7 +1,7 @@
 var number = 0;
 var clickerCount = 0;
 var ramp = 0;
-var wave = [];
+var blob = [];
 var retrig;
 
 function setup(){
@@ -9,10 +9,11 @@ function setup(){
     background(0);
     loadSign();
 
-    for (var i = 0; i < 128; i++) {
-        wave.push(new Arcs(i));
-        wave[i].init();
+    for (var i = 0; i < 20; i++) {
+        blob.push(new Circle(i));
     }
+
+
 }
 
 function draw() {
@@ -20,9 +21,9 @@ function draw() {
         renderSq();
     }
     if (csoundLoaded && clickerCount > 0) {
-        for (var i = 0; i < wave.length; i++) {
-            wave[i].update();
-            wave[i].draw();
+        for (var i = 0; i < blob.length; i++) {
+            blob[i].update();
+            blob[i].draw();
         }
     }
 }
@@ -65,34 +66,45 @@ function renderSq() {
     number = ((number + 0.1) % 100)+ 50;
 }
 
-function Arcs(index) {
+function Circle(index) {
     this.index = index;
-    this.offset = this.index * 2;
-    this.number = 0 - this.offset;
-    this.angle;
-    this.reposition = function() {
-        this.x = newX + this.index * random(0,5);
-        this.y = newY + this.index * random(0,5);
-    }
-    this.init = function() {
-        this.angle = random(0.5, 2);
-    }
+
+    this.ramp = 0 - (this.index*30)
+
+    this.posX = randomGaussian(windowWidth/2, windowWidth/5);
+    this.posY = randomGaussian(windowHeight/2, windowHeight/5);
+    this.fill = random(0, 10);
     this.update = function() {
-        this.number += 5;
+        if (this.ramp > 0) {
+            this.randFill = random(-2,2);
+            this.fill = this.fill + this.randFill
+            if (this.fill < 0) {
+                this.fill = 20;
+            } else if (this.fill > 255) {
+                this.fill = 235;
+            }
+
+            this.posX = this.posX + random(-4, 4);
+            this.posY = this.posY + random(-4, 4);
+        }
+
+
+        if (this.ramp < 1) {
+            this.ramp = this.ramp + 0.075;
+        }
+
+
     }
     this.draw = function() {
-        noFill();
-        if (this.number >= 0 && this.number < 256) {
-            stroke(this.number);
-        } else if (this.number == 500){
-            this.number = 0 - this.offset;
-            if (this.index == 0) {
-                newX = random(0, windowWidth);
-                newY = random(0, windowHeight);
-            }
-        } else {
-            stroke(0);
+        fill(this.fill * this.ramp);
+        this.size = (200 - this.fill)*2
+        if (this.size < 10) {
+            this.size = 10;
         }
-        arc(100 + this.index, 100 + this.index, this.index*2, this.index*2, this.index*0.05, this.angle+this.index*0.05);
+        noStroke();
+        if (this.ramp >= 0) {
+            ellipse(this.posX, this.posY, this.size, this.size);
+        }
     }
+
 }
